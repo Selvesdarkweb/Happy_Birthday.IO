@@ -33,20 +33,20 @@ class Paper {
   }
 
   handleMouseMove(e) {
-    if (!this.rotating) {
-      this.mouseX = e.clientX;
-      this.mouseY = e.clientY;
-      
-      this.velX = this.mouseX - this.prevMouseX;
-      this.velY = this.mouseY - this.prevMouseY;
-    }
+    if (!this.holdingPaper) return;
+
+    this.mouseX = e.clientX;
+    this.mouseY = e.clientY;
+
+    this.velX = this.mouseX - this.prevMouseX;
+    this.velY = this.mouseY - this.prevMouseY;
 
     if (this.holdingPaper) {
       if (!this.rotating) {
         this.currentPaperX += this.velX;
         this.currentPaperY += this.velY;
       }
-      
+
       this.prevMouseX = this.mouseX;
       this.prevMouseY = this.mouseY;
 
@@ -54,8 +54,8 @@ class Paper {
     }
 
     if (this.rotating) {
-      const dirX = e.clientX - this.mouseTouchX;
-      const dirY = e.clientY - this.mouseTouchY;
+      const dirX = this.mouseX - this.mouseTouchX;
+      const dirY = this.mouseY - this.mouseTouchY;
       const dirLength = Math.sqrt(dirX * dirX + dirY * dirY);
       const dirNormalizedX = dirX / dirLength;
       const dirNormalizedY = dirY / dirLength;
@@ -74,12 +74,11 @@ class Paper {
     this.paperElement.style.zIndex = highestZ;
     highestZ += 1;
 
-    if (e.button === 0) {
-      this.mouseTouchX = this.mouseX;
-      this.mouseTouchY = this.mouseY;
-      this.prevMouseX = this.mouseX;
-      this.prevMouseY = this.mouseY;
-    }
+    this.mouseTouchX = e.clientX;
+    this.mouseTouchY = e.clientY;
+    this.prevMouseX = e.clientX;
+    this.prevMouseY = e.clientY;
+
     if (e.button === 2) {
       this.rotating = true;
     }
@@ -99,7 +98,6 @@ class Paper {
     this.paperElement.style.zIndex = highestZ;
     highestZ += 1;
 
-    // Assume the first touch point is the relevant one
     const touch = e.touches[0];
     this.mouseTouchX = touch.clientX;
     this.mouseTouchY = touch.clientY;
@@ -122,7 +120,7 @@ class Paper {
         this.currentPaperX += this.velX;
         this.currentPaperY += this.velY;
       }
-      
+
       this.prevMouseX = this.mouseX;
       this.prevMouseY = this.mouseY;
 
@@ -149,7 +147,9 @@ class Paper {
   }
 }
 
+// Prevent default context menu on right click
 document.addEventListener('contextmenu', (e) => e.preventDefault());
 
+// Initialize Paper objects
 const papers = Array.from(document.querySelectorAll('.paper'));
 papers.forEach(paper => new Paper(paper));
