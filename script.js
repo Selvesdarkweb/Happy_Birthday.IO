@@ -29,7 +29,7 @@ class Paper {
     // Touch event listeners
     this.paperElement.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: false });
     this.paperElement.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: false });
-    window.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: false });
+    window.addEventListener('touchend', this.handleTouchEnd.bind(this));
   }
 
   handleMouseMove(e) {
@@ -50,20 +50,11 @@ class Paper {
       this.prevMouseX = this.mouseX;
       this.prevMouseY = this.mouseY;
 
-      this.paperElement.style.transform = `translateX(${this.currentPaperX}px) translateY(${this.currentPaperY}px) rotateZ(${this.rotation}deg)`;
+      this.updateTransform();
     }
 
     if (this.rotating) {
-      const dirX = this.mouseX - this.mouseTouchX;
-      const dirY = this.mouseY - this.mouseTouchY;
-      const dirLength = Math.sqrt(dirX * dirX + dirY * dirY);
-      const dirNormalizedX = dirX / dirLength;
-      const dirNormalizedY = dirY / dirLength;
-
-      const angle = Math.atan2(dirNormalizedY, dirNormalizedX);
-      let degrees = 180 * angle / Math.PI;
-      degrees = (360 + Math.round(degrees)) % 360;
-      this.rotation = degrees;
+      this.updateRotation(e.clientX, e.clientY);
     }
   }
 
@@ -124,20 +115,11 @@ class Paper {
       this.prevMouseX = this.mouseX;
       this.prevMouseY = this.mouseY;
 
-      this.paperElement.style.transform = `translateX(${this.currentPaperX}px) translateY(${this.currentPaperY}px) rotateZ(${this.rotation}deg)`;
+      this.updateTransform();
     }
 
     if (this.rotating) {
-      const dirX = this.mouseX - this.mouseTouchX;
-      const dirY = this.mouseY - this.mouseTouchY;
-      const dirLength = Math.sqrt(dirX * dirX + dirY * dirY);
-      const dirNormalizedX = dirX / dirLength;
-      const dirNormalizedY = dirY / dirLength;
-
-      const angle = Math.atan2(dirNormalizedY, dirNormalizedX);
-      let degrees = 180 * angle / Math.PI;
-      degrees = (360 + Math.round(degrees)) % 360;
-      this.rotation = degrees;
+      this.updateRotation(this.mouseX, this.mouseY);
     }
   }
 
@@ -145,9 +127,27 @@ class Paper {
     this.holdingPaper = false;
     this.rotating = false;
   }
+
+  updateTransform() {
+    this.paperElement.style.transform = `translateX(${this.currentPaperX}px) translateY(${this.currentPaperY}px) rotateZ(${this.rotation}deg)`;
+  }
+
+  updateRotation(x, y) {
+    const dirX = x - this.mouseTouchX;
+    const dirY = y - this.mouseTouchY;
+    const dirLength = Math.sqrt(dirX * dirX + dirY * dirY);
+    const dirNormalizedX = dirX / dirLength;
+    const dirNormalizedY = dirY / dirLength;
+
+    const angle = Math.atan2(dirNormalizedY, dirNormalizedX);
+    let degrees = 180 * angle / Math.PI;
+    degrees = (360 + Math.round(degrees)) % 360;
+    this.rotation = degrees;
+    this.updateTransform();
+  }
 }
 
-// Prevent default context menu on right click
+// Prevent default context menu on right-click
 document.addEventListener('contextmenu', (e) => e.preventDefault());
 
 // Initialize Paper objects
