@@ -29,7 +29,7 @@ class Paper {
     // Touch event listeners
     this.paperElement.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: false });
     this.paperElement.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: false });
-    window.addEventListener('touchend', this.handleTouchEnd.bind(this));
+    window.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: false });
   }
 
   handleMouseMove(e) {
